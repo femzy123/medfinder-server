@@ -1,5 +1,5 @@
 // This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// learn more about it in the docs https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
@@ -11,7 +11,7 @@ datasource db {
 }
 
 
-model users {
+model User {
   id      String   @id @default(auto()) @map("_id") @db.ObjectId
   email   String   @unique
   password String
@@ -20,10 +20,77 @@ model users {
   address Address
   country String
   role    String
+  created_at DateTime? @default(now()) 
+  updated_at DateTime?
+  Institution Institution[]
+  Professional Professional[] 
 }
 
 type Address {
   street String
   city   String
   state  String
+}
+
+model Institution {
+  id    String   @id @default(auto()) @map("_id") @db.ObjectId
+  name  String
+  email String
+  type  String
+  address String
+  city  String
+  state String
+  country String
+  geolocation Json
+  phone String
+  website String
+  services String[]
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  user    User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  String @db.ObjectId @unique
+}
+
+model Professional {
+  id String   @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  title String
+  specialty String
+  institution String
+  address String
+  city String
+  state String
+  country String
+  geolocation Json
+  phone String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  website String
+  bio String
+  user    User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  String @db.ObjectId @unique
+  education Education[]
+  experience Experience[]
+  certifications String[]
+}
+
+type Education {
+  institutionName String
+  degree String
+  fieldOfStudy String
+  startYear Int
+  endYear Int
+}
+
+type Experience {
+  institutionName String
+  position String
+  startYear Int
+  endYear Int
+}
+
+enum Role {
+  USER
+  ADMIN
+  MEDIC
 }
