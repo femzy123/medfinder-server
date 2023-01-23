@@ -20,7 +20,7 @@ router.post("/register", async (req, res) => {
     country: req.body.country
   };
   try {
-    const user = await prisma.users.create({
+    const user = await prisma.user.create({
       data: newUser,
     });
     const { password, ...info } = user;
@@ -40,7 +40,7 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    const user = await prisma.users.findUnique({
+    const user = await prisma.user.findUnique({
       where: {
         email: req.body.email,
       },
