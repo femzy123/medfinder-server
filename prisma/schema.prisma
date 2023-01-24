@@ -17,8 +17,6 @@ model User {
   password String
   name    String
   phone   String
-  address Address
-  country String
   type    String
   role    String
   createdAt DateTime? @default(now())
@@ -35,30 +33,32 @@ type Address {
 
 model Institution {
   id    String   @id @default(auto()) @map("_id") @db.ObjectId
+  address Address
+  country String
   institutionType  String
   geolocation Json
   website String
   services String[]
   createdAt DateTime? @default(now())
-  updatedAt DateTime? @default(now())
   user    User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId  String @db.ObjectId @unique
 }
 
 model Professional {
   id String   @id @default(auto()) @map("_id") @db.ObjectId
+  address Address
+  country String
   specialty String
   institution String
   geolocation Json
   createdAt DateTime? @default(now())
-  updatedAt DateTime? @default(now())
   website String
   bio String
   user    User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId  String @db.ObjectId @unique
   education Education[]
   experience Experience[]
-  certifications String[]
+  certifications Certification[]
 }
 
 type Education {
@@ -74,6 +74,12 @@ type Experience {
   position String
   startYear Int
   endYear Int
+}
+
+type Certification {
+  title String
+  description String
+  photoURL  String
 }
 
 enum Role {
