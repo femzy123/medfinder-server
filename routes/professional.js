@@ -13,7 +13,7 @@ const logger = winston.createLogger({
   ],
 });
 
-router.post("/:id/professional", async (req, res, next) => {
+router.post("/:id", async (req, res, next) => {
   const {
     address,
     country,
@@ -26,7 +26,8 @@ router.post("/:id/professional", async (req, res, next) => {
     experience,
     certifications,
   } = req.body;
-  const userId = parseInt(req.params.id);
+  const userId = req.params.id;
+
   logger.debug(req.body);
 
   if (!address || !country || !specialty || !institution || !bio || !education || !experience) {
@@ -70,23 +71,23 @@ router.use((error, req, res, next) => {
   }
 });
 
-router.get("/:id/profesional", async (req, res) => {
+router.get("/:id", async (req, res, next) => {
   try {
     const profile = await prisma.user.findUnique({
-      where: { id: Number(req.params.id) },
-      include: { professional: true },
+      where: { id: req.params.id },
+      include: { Professional: true },
     });
     const { password, role, ...info } = profile;
     res.status(200).json({ data: info });
   } catch (error) {
     logger.error(error);
-    res.status(500).json(error);
+    next(error)
   }
 });
 
 
 // Update User's Profile
-router.put("/:id/professional", verify, async (req, res) => {
+router.put("/:id/", verify, async (req, res) => {
   if (req.user.id === parseInt(req.params.id) || req.user.role === "ADMIN") {
     try {
       const professional = await prisma.professional.update({
@@ -123,4 +124,4 @@ router.delete("/:id", verify, async (req, res) => {
   }
 });
 
-export default router ;
+module.exports = router;

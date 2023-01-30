@@ -15,9 +15,8 @@ router.post("/register", async (req, res) => {
       process.env.SECRET_KEY
     ).toString(),
     phone: req.body.phone,
+    type: req.body.type,
     role: req.body.role,
-    address: req.body.address,
-    country: req.body.country
   };
   try {
     const user = await prisma.user.create({
