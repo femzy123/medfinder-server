@@ -2,6 +2,7 @@ const router = require("express").Router();
 const { PrismaClient, Prisma } = require("@prisma/client");
 const CryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
+const verify = require("../verifyToken");
 
 const prisma = new PrismaClient();
 
