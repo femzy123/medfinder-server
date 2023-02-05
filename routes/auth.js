@@ -2,23 +2,27 @@ const router = require("express").Router();
 const { PrismaClient, Prisma } = require("@prisma/client");
 const CryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
-const verify = require("../verifyToken");
+const winston = require("winston");
 
 const prisma = new PrismaClient();
 
+const logger = winston.createLogger({
+  level: "info",
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: "logs/auth.log" }),
+  ],
+});
+
 router.post("/register", async (req, res) => {
-  console.log(req.body);
-  const newUser = {
-    name: req.body.name,
-    email: req.body.email,
-    password: CryptoJS.AES.encrypt(
-      req.body.password,
-      process.env.SECRET_KEY
-    ).toString(),
-    phone: req.body.phone,
-    type: req.body.type,
-    role: req.body.role,
-  };
+  const { name, email, password, phone, type, role } = req.body;
+  logger.debug(req.body);
+  if (!name || !email || !password || !phone || !type || !role) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+  if (!/^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/.test(email)) {
+    return res.status(400).json({ message: "Invalid email format" });
+  }
   try {
     const user = await prisma.user.create({
       data: newUser,
@@ -26,6 +30,7 @@ router.post("/register", async (req, res) => {
     const { password, ...info } = user;
     res.status(201).json({ response: "User created successfully", data: info });
   } catch (err) {
+    logger.error(err.message);
     var message;
     if (err instanceof Prisma.PrismaClientKnownRequestError) {
       // The .code property can be accessed in a type-safe manner
