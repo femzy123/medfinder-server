@@ -81,9 +81,3 @@ type Certification {
   description String
   photoURL  String
 }
-
-enum Role {
-  USER
-  ADMIN
-  MEDIC
-}

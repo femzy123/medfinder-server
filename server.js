@@ -22,3 +22,5 @@ app.use("/api/professional", professionalRoute);
 app.use("/api/institution", institutionRoute);
 
 app.listen(5000, () => console.log("Server started on http://localhost:5000"));
+
+module.exports = app;

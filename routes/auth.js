@@ -16,6 +16,17 @@ const logger = winston.createLogger({
 
 router.post("/register", async (req, res) => {
   const { name, email, password, phone, type, role } = req.body;
+  const newUser = {
+    name,
+    email,
+    password: CryptoJS.AES.encrypt(
+      req.body.password,
+      process.env.SECRET_KEY
+    ).toString(),
+    phone,
+    type,
+    role,
+  };
   logger.debug(req.body);
   if (!name || !email || !password || !phone || !type || !role) {
     return res.status(400).json({ message: "All fields are required" });
@@ -32,12 +43,11 @@ router.post("/register", async (req, res) => {
   } catch (err) {
     logger.error(err.message);
     var message;
-    if (err instanceof Prisma.PrismaClientKnownRequestError) {
-      // The .code property can be accessed in a type-safe manner
       if (err.code === "P2002") {
         message = "A new user cannot be created with this email";
+      } else {
+        message = err.message
       }
-    }
     res.status(500).json({ message: message, ...err });
     console.log(err);
   }
