@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const { PrismaClient, Prisma } = require("@prisma/client");
 const winston = require("winston");
-const verify = require("../verifyToken");
+const verify = require("../middlewares/verifyAuth");
 
 const prisma = new PrismaClient();
 
@@ -9,7 +9,7 @@ const logger = winston.createLogger({
   level: "info",
   transports: [
     new winston.transports.Console(),
-    new winston.transports.File({ filename: "logs/professional.log" }),
+    new winston.transports.File({ filename: "logs/institutions.log" }),
   ],
 });
 
@@ -43,7 +43,7 @@ router.post("/:id", async (req, res, next) => {
   }
 
   try {
-    const newProfessional = await prisma.professional.create({
+    const newInstitution = await prisma.institution.create({
       data: {
         userId,
         address,
@@ -58,10 +58,10 @@ router.post("/:id", async (req, res, next) => {
         certifications,
       },
     });
-    logger.info("Professional created successfully");
+    logger.info("Institution created successfully");
     res.status(201).json({
-      message: "Professional created successfully",
-      data: newProfessional,
+      message: "Institution created successfully",
+      data: newInstitution,
     });
   } catch (error) {
     logger.error(error);
@@ -81,7 +81,7 @@ router.get("/:id", async (req, res, next) => {
   try {
     const profile = await prisma.user.findUnique({
       where: { id: req.params.id },
-      include: { Professional: true },
+      include: { Institution: true },
     });
     const { password, role, ...info } = profile;
     res.status(200).json({ data: info });
@@ -91,20 +91,18 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-// Update User's Professional Profile
-router.put("/:id/professional", verify, async (req, res, next) => {
+// Update User's Institution Profile
+router.put("/:id/institution", verify, async (req, res, next) => {
   if (req.user.id === req.params.id || req.user.role === "ADMIN") {
     try {
-      const professional = await prisma.professional.update({
+      const institution = await prisma.institution.update({
         where: { userId: req.params.id },
         data: req.body,
       });
-      res
-        .status(200)
-        .json({
-          message: "Professional updated succesfully",
-          data: professional,
-        });
+      res.status(200).json({
+        message: "Institution updated succesfully",
+        data: institution,
+      });
     } catch (error) {
       logger.error(error);
       next(error);

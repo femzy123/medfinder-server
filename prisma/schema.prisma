@@ -33,6 +33,7 @@ type Address {
 
 model Institution {
   id    String   @id @default(auto()) @map("_id") @db.ObjectId
+  bio String
   address Address
   country String
   institutionType  String

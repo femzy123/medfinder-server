@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const { PrismaClient, Prisma } = require("@prisma/client");
 const winston = require("winston");
-const verify = require("../verifyToken");
+const verify = require("../middlewares/verifyAuth");
 
 const prisma = new PrismaClient();
 
@@ -30,7 +30,15 @@ router.post("/:id", async (req, res, next) => {
 
   logger.debug(req.body);
 
-  if (!address || !country || !specialty || !institution || !bio || !education || !experience) {
+  if (
+    !address ||
+    !country ||
+    !specialty ||
+    !institution ||
+    !bio ||
+    !education ||
+    !experience
+  ) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
@@ -51,12 +59,10 @@ router.post("/:id", async (req, res, next) => {
       },
     });
     logger.info("Professional created successfully");
-    res
-      .status(201)
-      .json({
-        message: "Professional created successfully",
-        data: newProfessional,
-      });
+    res.status(201).json({
+      message: "Professional created successfully",
+      data: newProfessional,
+    });
   } catch (error) {
     logger.error(error);
     next(error);
@@ -81,10 +87,9 @@ router.get("/:id", async (req, res, next) => {
     res.status(200).json({ data: info });
   } catch (error) {
     logger.error(error);
-    next(error)
+    next(error);
   }
 });
-
 
 // Update User's Professional Profile
 router.put("/:id/professional", verify, async (req, res, next) => {
@@ -94,9 +99,10 @@ router.put("/:id/professional", verify, async (req, res, next) => {
         where: { userId: req.params.id },
         data: req.body,
       });
-      res
-        .status(200)
-        .json({ message: "Professional updated succesfully", data: professional });
+      res.status(200).json({
+        message: "Professional updated succesfully",
+        data: professional,
+      });
     } catch (error) {
       logger.error(error);
       next(error);
