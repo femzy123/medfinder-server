@@ -4,7 +4,8 @@
   "description": "",
   "scripts": {
     "start": "nodemon server",
-    "test": "mocha"
+    "test": "mocha",
+    "build": "pnpm i"
   },
   "keywords": [],
   "author": "Obafemi Ogunmokun",
