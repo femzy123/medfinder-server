@@ -60,7 +60,10 @@ router.post("/login", async (req, res) => {
         email: req.body.email,
       },
     });
-    !user && res.status(401).json({ message: "Wrong email or password" });
+
+    if (!user) {
+      return res.status(401).json({ message: "Wrong email or password" });
+    }
 
     const { password, ...info } = user;
 
@@ -69,16 +72,20 @@ router.post("/login", async (req, res) => {
       process.env.SECRET_KEY
     ).toString(CryptoJS.enc.Utf8);
 
-    decryptedPassword !== req.body.password &&
-      res.status(401).json({ message: "Wrong email or password" });
+    if (decryptedPassword !== req.body.password) {
+      return res.status(401).json({ message: "Wrong email or password" });
+    }
 
     const accessToken = jwt.sign({ id: info.id }, process.env.SECRET_KEY, {
       expiresIn: "5d",
     });
-    res.status(200).json({ ...info, accessToken });
+
+    return res.status(200).json({ ...info, accessToken });
   } catch (err) {
-    res.status(500).json("Something went wrong!");
+    console.log(err)
+    return res.status(500).json("Something went wrong!");
   }
 });
+
 
 module.exports = router;

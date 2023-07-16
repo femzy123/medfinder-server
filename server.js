@@ -9,7 +9,7 @@ const seedUsersRoute = require("./seeds/seedUsers");
 const seedOthersRoute = require("./seeds/seedOthers");
 
 const app = express();
-app.use(cors());
+// app.use(cors());
 dotenv.config();
 
 app.use(express.json());
